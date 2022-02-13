@@ -10,6 +10,10 @@
 
 #include "debug.hh"
 
+#ifdef __EMSCRIPTEN__
+#define uint unsigned int
+#endif
+
 template <std::size_t N>
 class Wordle {
 public:
@@ -272,7 +276,9 @@ int main()
         std::cout << "< " << word << '\n';
         if (find)
             return 0;
+#ifdef __EMSCRIPTEN__
         std::cout << "> ";
+#endif
         std::cin >> input;
         if (input.empty())
             return 0;
