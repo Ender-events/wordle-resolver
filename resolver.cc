@@ -11,6 +11,7 @@
 #include "debug.hh"
 
 #ifdef __EMSCRIPTEN__
+#include <emscripten.h>
 #define uint unsigned int
 #endif
 
@@ -277,9 +278,12 @@ int main()
         if (find)
             return 0;
 #ifdef __EMSCRIPTEN__
+        input = emscripten_run_script_string("prompt('Enter 5 letters result (b = black, g = green, y = yellow', 'bgbyb');");
+        std::cout << "> " << input << '\n';
+#else
         std::cout << "> ";
-#endif
         std::cin >> input;
+#endif
         if (input.empty())
             return 0;
         wordle.validWord(word, input);
