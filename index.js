@@ -196,7 +196,7 @@ var objAssign = Object.assign;
     }
 
     }
-    loadPackage({"files": [{"filename": "/allow_word.txt", "start": 0, "end": 13854}, {"filename": "/all_word.txt", "start": 13854, "end": 91536}], "remote_package_size": 91536, "package_uuid": "57f51b16-36ae-4434-a925-7a6966b9c5c0"});
+    loadPackage({"files": [{"filename": "/allow_word.txt", "start": 0, "end": 13854}, {"filename": "/all_word.txt", "start": 13854, "end": 91536}], "remote_package_size": 91536, "package_uuid": "0b1f6c79-29fd-4f0f-bed7-bd74192bf534"});
 
   })();
 
