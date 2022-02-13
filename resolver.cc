@@ -56,7 +56,7 @@ private:
         std::array<bool, 26> letters_;
     };
     std::array<Letters, N> word_;
-    Letters atLeast_;
+    std::array<Letters, N> atLeast_;
     std::vector<std::string> allowWord_;
     std::vector<std::string> allWord_;
 };
@@ -64,10 +64,11 @@ private:
 template <std::size_t N>
 Wordle<N>::Wordle(const std::string& allowPath, const std::string& allPath)
     : word_ {}
-    , atLeast_ { false }
+    , atLeast_ {}
     , allowWord_ { loadList(allowPath) }
     , allWord_ { loadList(allPath) }
 {
+    atLeast_.fill(false);
     debug << "allowWord size: " << allowWord_.size() << '\n';
 }
 
@@ -90,8 +91,9 @@ std::array<uint, 26> Wordle<N>::histogramLetter()
     res.fill(0);
     for (const auto& word : allowWord_) {
         Letters onlyOnce {};
-        for (char c : word) {
-            if (atLeast_.contains(c)) // TODO: rework at least in order to take into account position
+        for (std::size_t i = 0; i < N; ++i) {
+            char c = word[i];
+            if (atLeast_[i].contains(c))
                 continue;
             onlyOnce.unset(c);
         }
@@ -145,13 +147,13 @@ std::string Wordle<N>::discoverLetter()
 template <std::size_t N>
 std::pair<std::string, bool> Wordle<N>::nextWord()
 {
+    if (allowWord_.size() == 1)
+        return { allowWord_[0], true };
     if (allowWord_.size() < 10) {
         for (const auto& word : allowWord_) {
             debug << "maybe: " << word << '\n';
         }
     }
-    if (allowWord_.size() == 1)
-        return { allowWord_[0], true };
     return { discoverLetter(), false };
 }
 
@@ -166,9 +168,9 @@ void Wordle<N>::validWord(const std::string& word, const std::string& input)
             }
         } else if (input[i] == 'y') {
             word_[i].unset(c);
-            atLeast_.set(c);
+            atLeast_[i].set(c);
         } else if (input[i] == 'g') {
-            atLeast_.set(c);
+            atLeast_[i].is(c);
             word_[i].is(c);
         } else {
             throw "invalid input";
