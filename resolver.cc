@@ -5,6 +5,7 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 #include "debug.hh"
@@ -22,11 +23,14 @@ private:
     std::array<uint, 26> histogramLetter();
     void dumpHistogramLetter(const std::array<uint, 26>& histo);
     std::string discoverLetter();
+    bool transformYellowToGreen();
 
     class Letters {
     public:
+        static const char NIL = '\0';
         Letters(bool defaultVal = true)
             : letters_ {}
+            , c_ { NIL }
         {
             letters_.fill(defaultVal);
         };
@@ -48,12 +52,31 @@ private:
         void is(char c)
         {
             assert(c >= 'a' && c <= 'z');
+            c_ = c;
             letters_.fill(false);
             letters_[c - 'a'] = true;
+        }
+        char getChar()
+        {
+            return c_;
+        }
+        bool isGreen()
+        {
+            return c_ != NIL;
+        }
+        std::vector<char> toList()
+        {
+            std::vector<char> res;
+            for (char c = 'a'; c <= 'z'; ++c) {
+                if (contains(c))
+                    res.push_back(c);
+            }
+            return res;
         }
 
     private:
         std::array<bool, 26> letters_;
+        char c_;
     };
     std::array<Letters, N> word_;
     std::array<Letters, N> atLeast_;
@@ -176,6 +199,48 @@ void Wordle<N>::validWord(const std::string& word, const std::string& input)
             throw "invalid input";
         }
     }
+
+    while (transformYellowToGreen())
+        continue;
+
+    for (std::size_t i = 0; i < N; ++i) {
+        char c = word_[i].getChar();
+        if (c == Letters::NIL)
+            c = 'X';
+        debug << c;
+    }
+    debug << '\n';
+}
+
+template <std::size_t N>
+bool Wordle<N>::transformYellowToGreen()
+{
+    bool haveDoTransform = false;
+    for (std::size_t i = 0; i < N; ++i) {
+        if (word_[i].isGreen())
+            continue;
+        for (char c : atLeast_[i].toList()) {
+            // c is a yellow
+            std::unordered_set<char> potentialPos {};
+            for (std::size_t j = 0; j < N; ++j) {
+                if (word_[j].getChar() == c) {
+                    // but c is also green, no potential pos foundable
+                    potentialPos.clear();
+                    break;
+                }
+                if (not atLeast_[j].contains(c) && not word_[j].isGreen()) {
+                    potentialPos.emplace(j);
+                }
+            }
+            if (potentialPos.size() == 1) {
+                std::size_t pos = *potentialPos.begin();
+                atLeast_[pos].is(c);
+                word_[pos].is(c);
+                haveDoTransform = true;
+            }
+        }
+    }
+    return haveDoTransform;
 }
 
 template <std::size_t N>
