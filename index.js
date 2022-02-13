@@ -196,7 +196,7 @@ var objAssign = Object.assign;
     }
 
     }
-    loadPackage({"files": [{"filename": "/allow_word.txt", "start": 0, "end": 13854}, {"filename": "/all_word.txt", "start": 13854, "end": 91536}], "remote_package_size": 91536, "package_uuid": "d3c81757-b033-46c1-b2bf-1fd8c8bcf529"});
+    loadPackage({"files": [{"filename": "/allow_word.txt", "start": 0, "end": 13854}, {"filename": "/all_word.txt", "start": 13854, "end": 91536}], "remote_package_size": 91536, "package_uuid": "57f51b16-36ae-4434-a925-7a6966b9c5c0"});
 
   })();
 
@@ -4550,6 +4550,23 @@ var ASM_CONSTS = {
       abortOnCannotGrowMemory(requestedSize);
     }
 
+  function _emscripten_run_script_string(ptr) {
+      var s = eval(UTF8ToString(ptr));
+      if (s == null) {
+        return 0;
+      }
+      s += '';
+      var me = _emscripten_run_script_string;
+      var len = lengthBytesUTF8(s);
+      if (!me.bufferSize || me.bufferSize < len+1) {
+        if (me.bufferSize) _emscripten_builtin_free(me.buffer);
+        me.bufferSize = len+1;
+        me.buffer = _emscripten_builtin_malloc(me.bufferSize);
+      }
+      stringToUTF8(s, me.buffer, me.bufferSize);
+      return me.buffer;
+    }
+
   var ENV = {};
   
   function getExecutableName() {
@@ -5314,6 +5331,7 @@ var asmLibraryArg = {
   "abort": _abort,
   "emscripten_memcpy_big": _emscripten_memcpy_big,
   "emscripten_resize_heap": _emscripten_resize_heap,
+  "emscripten_run_script_string": _emscripten_run_script_string,
   "environ_get": _environ_get,
   "environ_sizes_get": _environ_sizes_get,
   "fd_close": _fd_close,
@@ -5341,6 +5359,12 @@ var _malloc = Module["_malloc"] = createExportWrapper("malloc");
 
 /** @type {function(...*):?} */
 var _free = Module["_free"] = createExportWrapper("free");
+
+/** @type {function(...*):?} */
+var _emscripten_builtin_malloc = Module["_emscripten_builtin_malloc"] = createExportWrapper("emscripten_builtin_malloc");
+
+/** @type {function(...*):?} */
+var _emscripten_builtin_free = Module["_emscripten_builtin_free"] = createExportWrapper("emscripten_builtin_free");
 
 /** @type {function(...*):?} */
 var _emscripten_stack_init = Module["_emscripten_stack_init"] = function() {
