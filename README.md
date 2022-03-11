@@ -27,7 +27,7 @@ Find a word with a good heuristic to discover the word of the day
 
 ## Emscripten
 
-You can use the script online https://ender-events.github.io/wordle-resolver/
+You can use the script online https://ender-events.github.io/wordle-resolver/ (Firefox only)
 
 ## Terminal
 

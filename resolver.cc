@@ -19,15 +19,15 @@ template <std::size_t N>
 class Wordle {
 public:
     Wordle(const std::string& allowPath, const std::string& allPath);
-    std::pair<std::string, bool> nextWord();
+    std::pair<std::string, bool> nextWord() const;
     std::vector<char> validWord(const std::string& word, const std::string& input);
     void trimWord(const std::vector<char>& yellow);
 
 private:
     std::vector<std::string> loadList(const std::string& path);
-    std::array<uint, 26> histogramLetter();
-    void dumpHistogramLetter(const std::array<uint, 26>& histo);
-    std::string discoverLetter();
+    std::array<uint, 26> histogramLetter() const;
+    void dumpHistogramLetter(const std::array<uint, 26>& histo) const;
+    std::string discoverLetter() const;
     bool transformYellowToGreen();
 
     class Letters {
@@ -39,7 +39,7 @@ private:
         {
             letters_.fill(defaultVal);
         };
-        bool contains(char c)
+        bool contains(char c) const
         {
             assert(c >= 'a' && c <= 'z');
             return letters_[c - 'a'];
@@ -61,15 +61,15 @@ private:
             letters_.fill(false);
             letters_[c - 'a'] = true;
         }
-        char getChar()
+        char getChar() const
         {
             return c_;
         }
-        bool isGreen()
+        bool isGreen() const
         {
             return c_ != NIL;
         }
-        std::vector<char> toList()
+        std::vector<char> toList() const
         {
             std::vector<char> res;
             for (char c = 'a'; c <= 'z'; ++c) {
@@ -113,7 +113,7 @@ std::vector<std::string> Wordle<N>::loadList(const std::string& path)
 }
 
 template <std::size_t N>
-std::array<uint, 26> Wordle<N>::histogramLetter()
+std::array<uint, 26> Wordle<N>::histogramLetter() const
 {
     std::array<uint, 26> res {};
     res.fill(0);
@@ -134,7 +134,7 @@ std::array<uint, 26> Wordle<N>::histogramLetter()
 }
 
 template <std::size_t N>
-void Wordle<N>::dumpHistogramLetter(const std::array<uint, 26>& histo)
+void Wordle<N>::dumpHistogramLetter(const std::array<uint, 26>& histo) const
 {
     std::multimap<uint, char> sorted {};
     for (char c = 'a'; c <= 'z'; c++) {
@@ -147,7 +147,7 @@ void Wordle<N>::dumpHistogramLetter(const std::array<uint, 26>& histo)
 }
 
 template <std::size_t N>
-std::string Wordle<N>::discoverLetter()
+std::string Wordle<N>::discoverLetter() const
 {
     auto histo = histogramLetter();
     dumpHistogramLetter(histo);
@@ -173,7 +173,7 @@ std::string Wordle<N>::discoverLetter()
 }
 
 template <std::size_t N>
-std::pair<std::string, bool> Wordle<N>::nextWord()
+std::pair<std::string, bool> Wordle<N>::nextWord() const
 {
     if (allowWord_.size() == 1)
         return { allowWord_[0], true };
