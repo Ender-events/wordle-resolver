@@ -20,8 +20,8 @@ class Wordle {
 public:
     Wordle(const std::string& allowPath, const std::string& allPath);
     std::pair<std::string, bool> nextWord();
-    void validWord(const std::string& word, const std::string& input);
-    void trimWord();
+    std::vector<char> validWord(const std::string& word, const std::string& input);
+    void trimWord(const std::vector<char>& yellow);
 
 private:
     std::vector<std::string> loadList(const std::string& path);
@@ -186,8 +186,9 @@ std::pair<std::string, bool> Wordle<N>::nextWord()
 }
 
 template <std::size_t N>
-void Wordle<N>::validWord(const std::string& word, const std::string& input)
+std::vector<char> Wordle<N>::validWord(const std::string& word, const std::string& input)
 {
+    std::vector<char> yellow {};
     for (std::size_t i = 0; i < N; ++i) {
         char c = word[i];
         if (input[i] == 'b') {
@@ -197,6 +198,7 @@ void Wordle<N>::validWord(const std::string& word, const std::string& input)
         } else if (input[i] == 'y') {
             word_[i].unset(c);
             atLeast_[i].set(c);
+            yellow.push_back(c);
         } else if (input[i] == 'g') {
             atLeast_[i].is(c);
             word_[i].is(c);
@@ -215,6 +217,7 @@ void Wordle<N>::validWord(const std::string& word, const std::string& input)
         debug << c;
     }
     debug << '\n';
+    return yellow;
 }
 
 template <std::size_t N>
@@ -249,7 +252,7 @@ bool Wordle<N>::transformYellowToGreen()
 }
 
 template <std::size_t N>
-void Wordle<N>::trimWord()
+void Wordle<N>::trimWord(const std::vector<char>& yellow)
 {
     allowWord_.erase(std::remove_if(
                          allowWord_.begin(),
@@ -265,6 +268,21 @@ void Wordle<N>::trimWord()
                              return false;
                          }),
         allowWord_.end());
+
+    for (char yChar : yellow) {
+        allowWord_.erase(std::remove_if(
+                             allowWord_.begin(),
+                             allowWord_.end(),
+                             [yChar](const auto& word) {
+                                 for (char c : word) {
+                                     if (yChar == c) {
+                                         return false;
+                                     }
+                                 };
+                                 return true;
+                             }),
+            allowWord_.end());
+    }
     debug << "allowWord size: " << allowWord_.size() << '\n';
 }
 
@@ -286,7 +304,7 @@ int main()
 #endif
         if (input.empty())
             return 0;
-        wordle.validWord(word, input);
-        wordle.trimWord();
+        auto yellow = wordle.validWord(word, input);
+        wordle.trimWord(yellow);
     }
 }
